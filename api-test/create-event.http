@@ -1,0 +1,8 @@
+POST http://localhost:8080/events
+Content-Type: "application/json"
+
+{
+    "Name":"test name",
+    "Description":"test desc",
+    "Location":"test loc"
+}
