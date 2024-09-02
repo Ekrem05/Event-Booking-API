@@ -3,6 +3,7 @@ package models
 import (
 	"api/db"
 	"api/utils"
+	"errors"
 )
 
 type User struct {
@@ -24,4 +25,32 @@ func (user User) Save() error {
 		return err;
 	}
 	return nil
+}
+
+func (user User) Validate() (string,error) {
+
+	validEmailQuery:=`SELECT * FROM users 
+	WHERE email=$1`
+
+	row:=db.DB.QueryRow(validEmailQuery,user.Email)
+	
+	var userFound User 
+	err:=row.Scan(&userFound.Id,&userFound.Email,&userFound.Password)
+
+	if err!=nil{
+		return "",err
+	}
+
+	isValid:=utils.CheckPassword(user.Password,userFound.Password)
+
+	if !isValid{
+		return "",errors.New("Invalid password")
+	}
+
+	token,err:=utils.Generate(userFound.Email,userFound.Id)
+	if err!=nil{
+		return "",err
+	}
+
+	return token,nil
 }
