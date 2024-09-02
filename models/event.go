@@ -12,14 +12,15 @@ type Event struct {
 	Description string `binding:"required"`
 	Location    string `binding:"required"`
 	DateTime    time.Time
-	UserId int
+	UserId int64
 }
 
-func (event Event) Save() error{
+func (event *Event) Save() error {
 	var query string= `
 	INSERT INTO events (name,description,location,datetime,user_id)(
 		VALUES ($1, $2, $3, $4, $5)
 	)
+		RETURNING id
 	`
 	sqlStm,err:=db.DB.Prepare(query)
 	
@@ -27,17 +28,16 @@ func (event Event) Save() error{
 		return err;
 	}
 	defer sqlStm.Close()
-	result,err:=sqlStm.Exec(event.Name,event.Description,event.Location,event.DateTime,event.UserId)
+	result:=sqlStm.QueryRow(event.Name,event.Description,event.Location,event.DateTime,event.UserId)
 
 	if err!=nil{
 		return err;
 	}
-	id,err:=result.LastInsertId()
-
+	
+	err=result.Scan(&event.Id)
 	if err!=nil{
 		return err;
 	}
-	event.Id=id;
 	return nil
 }
 
