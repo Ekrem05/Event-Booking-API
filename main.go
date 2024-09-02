@@ -20,9 +20,13 @@ func main() {
 }
 
 func index(context *gin.Context) {
-  
-	body:=map[string]string{"message":"Hello World!"}
-	context.JSON(200,body);
+	events,err:=events.GetAll();
+	if err!=nil{
+		context.JSON(500,gin.H{"error":"Failed to fetch events"})
+	}
+
+	
+	context.JSON(200,events);
 }
 func createEvent(context *gin.Context) {
 	var event events.Event;

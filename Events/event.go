@@ -2,6 +2,7 @@ package events
 
 import (
 	"api/db"
+	"fmt"
 	"time"
 )
 
@@ -18,8 +19,8 @@ var events = []Event{}
 
 func (event Event) Save() error{
 	var query string= `
-	INSERT INTO events (name,description,location,dateTime,user_Id)(
-		VALUES (?,?,?,?,?)
+	INSERT INTO events (name,description,location,datetime,user_id)(
+		VALUES ($1, $2, $3, $4, $5)
 	)
 	`
 	sqlStm,err:=db.DB.Prepare(query)
@@ -42,14 +43,14 @@ func (event Event) Save() error{
 	return nil
 }
 
-func GetAll() error{
+func GetAll() ([]Event, error){
 	var query string= `
 	SELECT * FROM events
 	` 
 	rows,err:=db.DB.Query(query)
 
 	if err!=nil{
-		return err
+		return nil,err
 	}
 
 	defer rows.Close()
@@ -58,8 +59,9 @@ func GetAll() error{
 
 	for rows.Next(){
 		var event Event
+		fmt.Print(rows)
 		rows.Scan(&event.Id,&event.Name,&event.Description,&event.Location,&event.DateTime,&event.UserId);
 		events=append(events, event)
 	}
-	return nil
+	return events,nil
 }
