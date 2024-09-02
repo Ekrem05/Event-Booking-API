@@ -26,15 +26,23 @@ func InitDB() {
 }
 
 func createTables() error {
-    const query = `
+    const createEvents = `
     CREATE TABLE IF NOT EXISTS events (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT NOT NULL,
         location TEXT NOT NULL,
         dateTime TIMESTAMP NOT NULL,
-        user_id INTEGER
+        user_id INTEGER foreign key (user_id) REFERENCES users(id)
     )`
-    _, err := DB.Exec(query)
+    const createUsers = `
+    CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+    )`
+    _, err := DB.Exec(createEvents)
+    _, err = DB.Exec(createUsers)
+
     return err
 }
