@@ -33,7 +33,8 @@ func createTables() error {
         description TEXT NOT NULL,
         location TEXT NOT NULL,
         dateTime TIMESTAMP NOT NULL,
-        user_id INTEGER foreign key (user_id) REFERENCES users(id)
+        user_id INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     )`
     const createUsers = `
     CREATE TABLE IF NOT EXISTS users (
