@@ -2,6 +2,7 @@ package routes
 
 import (
 	events "api/models"
+	"api/utils"
 	"strconv"
 	"time"
 
@@ -19,17 +20,30 @@ func index(context *gin.Context) {
 	context.JSON(200, events)
 }
 func createEvent(context *gin.Context) {
-	var event events.Event
-	err := context.BindJSON(&event)
+
+	token:=context.Request.Header.Get("Authorization")
+
+	userId,err:=utils.Verify(token)
+	
+	if err != nil {
+		context.JSON(401, gin.H{"error": "Not Authorized"})
+		return
+	}
+	var event *events.Event
+	err = context.BindJSON(&event)
 
 	if err != nil {
 		context.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	event.Id = 1
+	event.UserId = userId;
 	event.DateTime = time.Now()
-	event.Save()
+	err=event.Save()
+	if err != nil {
+		context.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
 	context.JSON(200, event)
 }
 
