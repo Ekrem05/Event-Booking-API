@@ -90,3 +90,39 @@ func GetById(id int64) (*Event,error){
 	
 	return &event,nil
 }
+
+func UpdateEvent(event *Event) error {
+	var query string = `UPDATE events
+	SET name = $1, description = $2, location = $3, datetime = $4
+	WHERE id = $5
+	`
+
+	sqlStm,err:=db.DB.Prepare(query)
+	
+	if err!=nil{
+		return err;
+	}
+	defer sqlStm.Close();
+
+	_,err=sqlStm.Exec(event.Name,event.Description,event.Location,event.DateTime,event.Id);
+	if err!=nil{
+		return err;
+	}
+	return nil;
+} 
+
+func DeleteEvent(id int64) error {
+	var query string = `DELETE FROM events WHERE id = $1`;
+	sqlStm,err:=db.DB.Prepare(query)
+	
+	if err!=nil{
+		return err;
+	}
+	defer sqlStm.Close();
+
+	_,err=sqlStm.Exec(id);
+	if err!=nil{
+		return err;
+	}
+	return nil
+}

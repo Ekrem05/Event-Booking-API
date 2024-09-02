@@ -48,3 +48,54 @@ func getEvent(context *gin.Context) {
 	}
 	context.JSON(200, event)
 }
+
+func updateEvent(context *gin.Context){
+	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+
+	if err != nil {
+		context.JSON(400, gin.H{"error": "Invalid parameter"})
+		return
+	}
+	_, err = events.GetById(id)
+	if err != nil {
+		context.JSON(500, gin.H{"error": "Failed to get an event by the specified id"})
+		return
+
+	}
+
+	var updatedEvent events.Event 
+	err=context.ShouldBindJSON(&updatedEvent)
+	if err != nil {
+		context.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	updatedEvent.Id = id;
+	err=events.UpdateEvent(&updatedEvent)
+	if err != nil {
+		context.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	context.JSON(200,nil)
+}
+
+func deleteEvent(context *gin.Context){
+	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+
+	if err != nil {
+		context.JSON(400, gin.H{"error": "Invalid parameter"})
+		return
+	}
+
+	if err != nil {
+		context.JSON(500, gin.H{"error": "Could not find an event with this id"})
+		return
+
+	}
+	err = events.DeleteEvent(id);
+	if err != nil {
+		context.JSON(500, gin.H{"error": "Could not delete the event"})
+		return
+
+	}
+	context.JSON(200, nil)
+}
