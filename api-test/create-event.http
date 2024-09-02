@@ -2,7 +2,7 @@ POST http://localhost:8080/events
 Content-Type: "application/json"
 
 {
-    "Name":"test 2",
-    "Description":"Description 2",
-    "Location":"Location loc"
+    "Name":"test 3",
+    "Description":"Description 3",
+    "Location":"Location 3"
 }
