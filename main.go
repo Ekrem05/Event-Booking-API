@@ -3,6 +3,7 @@ package main
 import (
 	events "api/Events"
 	"api/db"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ func main() {
 	//endpoints
 	server.GET("/",index)
 	server.POST("events",createEvent)
+	server.GET("events/:id",getEvent)
 
 
 	//run server
@@ -23,6 +25,8 @@ func index(context *gin.Context) {
 	events,err:=events.GetAll();
 	if err!=nil{
 		context.JSON(500,gin.H{"error":"Failed to fetch events"})
+		return;
+
 	}
 
 	
@@ -33,7 +37,7 @@ func createEvent(context *gin.Context) {
 	err:=context.BindJSON(&event);
 
 	if err!=nil{
-		context.JSON(400,gin.H{"message": err.Error()})
+		context.JSON(400,gin.H{"error": err.Error()})
 		return;
 	}
 
@@ -41,4 +45,20 @@ func createEvent(context *gin.Context) {
 	event.DateTime=time.Now();
 	event.Save()
 	context.JSON(200,event);
+}
+
+func getEvent(context *gin.Context){
+	id,err:=strconv.ParseInt(context.Param("id"),10,64);
+
+	if err!=nil{
+		context.JSON(400,gin.H{"error":"Invalid parameter"})
+		return;
+	}
+	event,err:=events.GetById(id)
+	if err!=nil{
+		context.JSON(500,gin.H{"error":"Failed to get an event by the specified id"})
+		return;
+
+	}
+	context.JSON(200,event)
 }
