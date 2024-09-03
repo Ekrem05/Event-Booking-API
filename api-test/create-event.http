@@ -1,9 +1,9 @@
 POST http://localhost:8080/events
 Content-Type: "application/json"
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVrcmVtTmV3QGdtYWlsLmNvbSIsImV4cCI6MTcyNTMwNTg1MSwidXNlcklkIjo5fQ.muI3X4r053YwNhrEQzz6Nra3cUNCHXqzWtMvSqVIDtI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVrcmVtc2tpaUBnbWFpbC5jb20iLCJleHAiOjE3MjUzODgzNzEsInVzZXJJZCI6MTB9.sHutWTCb8I45SW1vpgud3fnmBL9g7K01tvrrZEkSap0
 
 {
-    "Name":"test 3",
+    "Name":"test neww",
     "Description":"Description 3",
     "Location":"Location 3"
 }

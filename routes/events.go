@@ -2,7 +2,6 @@ package routes
 
 import (
 	events "api/models"
-	"api/utils"
 	"strconv"
 	"time"
 
@@ -20,24 +19,16 @@ func index(context *gin.Context) {
 	context.JSON(200, events)
 }
 func createEvent(context *gin.Context) {
-
-	token:=context.Request.Header.Get("Authorization")
-
-	userId,err:=utils.Verify(token)
 	
-	if err != nil {
-		context.JSON(401, gin.H{"error": "Not Authorized"})
-		return
-	}
 	var event *events.Event
-	err = context.BindJSON(&event)
+	err := context.BindJSON(&event)
 
 	if err != nil {
 		context.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	event.UserId = userId;
+	event.UserId = context.GetInt64("userId");
 	event.DateTime = time.Now()
 	err=event.Save()
 	if err != nil {
@@ -70,11 +61,19 @@ func updateEvent(context *gin.Context){
 		context.JSON(400, gin.H{"error": "Invalid parameter"})
 		return
 	}
-	_, err = events.GetById(id)
+
+	event, err := events.GetById(id)
+
 	if err != nil {
 		context.JSON(500, gin.H{"error": "Failed to get an event by the specified id"})
 		return
+	}
 
+	userId:=context.GetInt64("userId");
+
+	if userId!=event.UserId{
+		context.JSON(401, gin.H{"error": "Unauthorized"})
+		return
 	}
 
 	var updatedEvent events.Event 
@@ -94,17 +93,23 @@ func updateEvent(context *gin.Context){
 
 func deleteEvent(context *gin.Context){
 	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
-
 	if err != nil {
 		context.JSON(400, gin.H{"error": "Invalid parameter"})
 		return
 	}
 
+	event, err := events.GetById(id)
 	if err != nil {
-		context.JSON(500, gin.H{"error": "Could not find an event with this id"})
+		context.JSON(500, gin.H{"error": "Failed to get an event by the specified id"})
 		return
-
 	}
+
+	userId:=context.GetInt64("userId");
+	if userId!=event.UserId{
+		context.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	err = events.DeleteEvent(id);
 	if err != nil {
 		context.JSON(500, gin.H{"error": "Could not delete the event"})
